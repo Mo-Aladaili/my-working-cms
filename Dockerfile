@@ -1,39 +1,33 @@
 FROM python:3.10-slim
-
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 1. Native lightweight package mapping configuration
+# 1. Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    postgresql-client \
-    build-essential \
-    libpq-dev \
-    libcap-dev \
-    supervisor \
-    curl && \
+    git postgresql postgresql-contrib build-essential \
+    libpq-dev libcap-dev supervisor curl && \
     rm -rf /var/lib/apt/lists/*
 
-# 2. Extract and load the core CMS software configurations 
+# 2. Download and install CMS officially
 RUN git clone --recursive https://github.com /opt/cms
 WORKDIR /opt/cms
 RUN pip install --no-cache-dir -r requirements.txt && python setup.py install
 
-# 3. Create the direct configuration environment properties
-RUN mkdir -p /usr/local/etc/ && \
-    echo '{"database": "postgresql://cmsuser:cmspass@localhost/cmsdb"}' > /usr/local/etc/cms.conf
+# 3. Configure local Postgres database out of the box
+USER postgres
+RUN /etc/init.d/postgresql start && \
+    psql --command "CREATE USER cmsuser WITH PASSWORD 'cmspass';" && \
+    psql --command "CREATE DATABASE cmsdb OWNER cmsuser;"
 
+USER root
+RUN mkdir -p /usr/local/etc/ && \
+    echo '{"database": "postgresql://cmsuser:cmspass@localhost/cmsdb"}' > /usr/local/etc/cms.conf && \
+    /etc/init.d/postgresql start && cmsInitDB
+
+# Open port 8888 for Contestants and 8889 for Admin panel
 EXPOSE 8888
 EXPOSE 8889
 
-# 4. Pull down the clean 300MB data configuration securely at boot
-# REMINDER: Make sure you replace PASTE_YOUR_LINK_HERE with your newest file.io download link!
-RUN curl -L "https://file.io" -o /tmp/my_base64_data.txt
-
-# 5. Initialize base database schemas and seed tables cleanly
-RUN service postgresql start || true && \
-    cat /tmp/my_base64_data.txt | base64 -d | gunzip > /tmp/restore.sql || true
-
-# 6. Configure process handlers 
-RUN echo "[program:cmsAdmin]\ncommand=cmsAdminWebServer\nautostart=true\nautorestart=true\n\n[program:cmsContest]\ncommand=cmsContestWebServer\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/cms.conf
+# Configure process handlers to run DB and CMS together
+RUN echo "[program:postgres]\ncommand=/usr/lib/postgresql/14/bin/postgres -D /var/lib/postgresql/14/main -c config_file=/etc/postgresql/14/main/postgresql.conf\nuser=postgres\n\n[program:cmsAdmin]\ncommand=cmsAdminWebServer\nautostart=true\nautorestart=true\n\n[program:cmsContest]\ncommand=cmsContestWebServer\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/cms.conf
 
 CMD ["/usr/bin/supervisord", "-n"]
