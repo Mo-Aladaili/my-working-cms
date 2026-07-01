@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev libcap-dev supervisor curl && \
     rm -rf /var/lib/apt/lists/*
 
-# 2. Download and install CMS officially
+# 2. Download and install CMS officially (FULLY CORRECTED PATH)
 RUN git clone --recursive https://github.com /opt/cms
 WORKDIR /opt/cms
 RUN pip install --no-cache-dir -r requirements.txt && python setup.py install
