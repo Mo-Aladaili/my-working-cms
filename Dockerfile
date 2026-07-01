@@ -24,12 +24,12 @@ RUN mkdir -p /usr/local/etc/ && \
 EXPOSE 8888
 EXPOSE 8889
 
-RUN echo "[program:postgres]\ncommand=/usr/lib/postgresql/14/bin/postgres -D /var/lib/postgresql/14/main -c config_file=/etc/postgresql/14/main/postgresql.conf\nuser=postgres\n\n[program:cmsAdmin]\ncommand=cmsAdminWebServer\nautostart=true\n24/7=true\n\n[program:cmsContest]\ncommand=cmsContestWebServer\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/cms.conf
+RUN echo "[program:postgres]\ncommand=/usr/lib/postgresql/14/bin/postgres -D /var/lib/postgresql/14/main -c config_file=/etc/postgresql/14/main/postgresql.conf\nuser=postgres\n\n[program:cmsAdmin]\ncommand=cmsAdminWebServer\nautostart=true\nautorestart=true\n\n[program:cmsContest]\ncommand=cmsContestWebServer\nautostart=true\nautorestart=true" > /etc/supervisor/conf.d/cms.conf
 
-# This entry script decodes and restores your data on-the-fly at boot setup
+# This entry script reads the raw text backup file uploaded via Render Dashboard
 CMD /etc/init.d/postgresql start && \
-    if [ ! -z "$CONTEST_DATA" ]; then \
-        echo "$CONTEST_DATA" | base64 -d | gunzip | psql -U cmsuser -h localhost -d cmsdb; \
+    if [ -f "/etc/secrets/backup.sql" ]; then \
+        psql -U cmsuser -h localhost -d cmsdb -f /etc/secrets/backup.sql; \
         cmsInitDB; \
     fi && \
     /usr/bin/supervisord -n
