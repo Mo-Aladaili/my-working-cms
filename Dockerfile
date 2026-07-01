@@ -12,9 +12,9 @@ WORKDIR /opt/cms
 
 RUN pip install --no-cache-dir -r requirements.txt && python setup.py install
 
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY start-admin.sh /start-admin.sh
+COPY start-contest.sh /start-contest.sh
+
+RUN chmod +x /start-admin.sh /start-contest.sh
 
 EXPOSE 10000
-
-CMD ["/start.sh"]
