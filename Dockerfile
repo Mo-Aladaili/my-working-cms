@@ -6,6 +6,10 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
+    gcc \
+    g++ \
+    make \
+    pkg-config \
     libpq-dev \
     libcap-dev \
     libffi-dev \
@@ -14,6 +18,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/ioi/isolate.git /tmp/isolate \
+    && cd /tmp/isolate \
+    && make \
+    && make install \
+    && chmod 4755 /usr/local/bin/isolate \
+    && rm -rf /tmp/isolate
 
 RUN git clone --recursive https://github.com/cms-dev/cms.git /opt/cms
 
