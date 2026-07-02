@@ -67,4 +67,21 @@ echo "CMS TOML CREATED:"
 grep -n "^\[database\]" /usr/local/etc/cms.toml
 grep -n "^url" /usr/local/etc/cms.toml | sed 's/:.*@/:PASSWORD@/g'
 
-cmsContestWebServer 0 -c 1
+cmsInitDB || true
+
+cmsLogService &
+cmsResourceService &
+cmsScoringService &
+cmsEvaluationService &
+cmsWorker 0 &
+cmsProxyService &
+
+sleep 3
+
+while true
+do
+    echo "Starting contest web server..."
+    cmsContestWebServer 0 -c 1 || true
+    echo "Contest web server exited. Retrying in 30 seconds..."
+    sleep 30
+done
