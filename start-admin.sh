@@ -68,6 +68,7 @@ grep -n "^\[database\]" /usr/local/etc/cms.toml
 grep -n "^url" /usr/local/etc/cms.toml | sed 's/:.*@/:PASSWORD@/g'
 
 cmsInitDB || true
+cmsAddAdmin -p admin admin || true
 
 cmsLogService &
 cmsResourceService &
