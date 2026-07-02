@@ -3,7 +3,7 @@ FROM python:3.10-slim-bookworm
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git build-essential libpq-dev libcap-dev curl
+    git build-essential libpq-dev libcap-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --recursive https://github.com/cms-dev/cms.git /opt/cms
