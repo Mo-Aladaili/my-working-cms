@@ -70,13 +70,14 @@ grep -n "^url" /usr/local/etc/cms.toml | sed 's/:.*@/:PASSWORD@/g'
 cmsInitDB || true
 cmsAddAdmin -p admin admin || true
 
-cmsLogService &
-cmsResourceService &
-cmsScoringService &
-cmsEvaluationService &
+cmsLogService 0 &
+cmsResourceService 0 &
+cmsChecker 0 &
+cmsScoringService 0 &
+cmsEvaluationService 0 &
 cmsWorker 0 &
-cmsProxyService &
+cmsProxyService 0 -c 1 &
 
-sleep 3
+sleep 5
 
 cmsAdminWebServer 0
