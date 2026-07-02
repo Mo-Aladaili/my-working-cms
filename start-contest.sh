@@ -67,4 +67,4 @@ echo "CMS TOML CREATED:"
 grep -n "^\[database\]" /usr/local/etc/cms.toml
 grep -n "^url" /usr/local/etc/cms.toml | sed 's/:.*@/:PASSWORD@/g'
 
-cmsContestWebServer 0
+cmsContestWebServer 0 -c 1
