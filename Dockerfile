@@ -24,9 +24,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN git clone https://github.com/ioi/isolate.git /tmp/isolate \
     && cd /tmp/isolate \
-    && make \
-    && make install \
-    && chmod 4755 /usr/local/bin/isolate \
+    && make isolate isolate-cg-keeper \
+    && install -m 4755 isolate /usr/local/bin/isolate \
+    && install -m 0755 isolate-cg-keeper /usr/local/bin/isolate-cg-keeper \
+    && mkdir -p /usr/local/etc \
     && rm -rf /tmp/isolate
 
 RUN git clone --recursive https://github.com/cms-dev/cms.git /opt/cms
