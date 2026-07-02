@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcap-dev \
     libffi-dev \
     libyaml-dev \
+    libseccomp-dev \
+    libsystemd-dev \
     libcups2-dev \
     curl \
     postgresql-client \
