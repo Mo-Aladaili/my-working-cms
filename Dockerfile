@@ -1,16 +1,26 @@
 FROM python:3.10-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git build-essential libpq-dev libcap-dev curl \
+    git \
+    build-essential \
+    libpq-dev \
+    libcap-dev \
+    libffi-dev \
+    libyaml-dev \
+    libcups2-dev \
+    curl \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --recursive https://github.com/cms-dev/cms.git /opt/cms
 
 WORKDIR /opt/cms
 
-RUN pip install --no-cache-dir -r requirements.txt && python setup.py install
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -c constraints.txt .
 
 COPY start-admin.sh /start-admin.sh
 COPY start-contest.sh /start-contest.sh
@@ -18,3 +28,5 @@ COPY start-contest.sh /start-contest.sh
 RUN chmod +x /start-admin.sh /start-contest.sh
 
 EXPOSE 10000
+
+CMD ["/start-contest.sh"]
