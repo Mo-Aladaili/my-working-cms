@@ -3,10 +3,8 @@ set -e
 
 mkdir -p /usr/local/etc
 
-cat > /usr/local/etc/cms.conf <<EOF
-{
-  "database": "$DATABASE_URL"
-}
+cat > /usr/local/etc/cms.toml <<EOF
+database = """$DATABASE_URL"""
 EOF
 
 cmsInitDB || true
