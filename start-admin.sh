@@ -75,5 +75,8 @@ cmsResourceService &
 cmsScoringService &
 cmsEvaluationService &
 cmsWorker 0 &
+cmsProxyService &
+
+sleep 3
 
 cmsAdminWebServer 0
